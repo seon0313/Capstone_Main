@@ -9,21 +9,25 @@
 
 2024 서울로봇고의 캡스톤 대회 중심팀 출품작의 메인 소스코드
 
+
+![circuit.png](/images/rpi4b.svg)
+
 ***
 
 ### 목차
-* 개요
-* 목차
-* 팀원 소개
-* 라이센스
-* 작동 방식
-* 사용 부품 리스트
+* [개요](#개요)
+* [목차](#목차)
+* [팀원 소개](#팀원-소개)
+* [라이센스](#라이센스)
+* [작동 방식](#작동-방식)
+* [사용법](#사용법)
+* [사용 부품 리스트](#사용-부품-리스트)
 ***
 
 ### 팀원 소개
 
-| 학년 | 이름 | 역할              |
-| --- | --- |-----------------|
+| 학년 | 이름 | 역할 |
+| :---: | :---: | :--- |
 | 2 | 추윤선 | 팀장, 코딩, 설계, 제작  |
 | 2 | 백수현 | 설계, 조립, 테스트, 제작 |
 | 2 | 하정호 | 코딩, 테스트 |
@@ -40,7 +44,7 @@ Apache-2.0 license를 따릅니다.
 
 ***
 
-### 작동방식
+### 작동 방식
 
 이 로봇은 하나의 라즈베리파이에 두개의 ESP32가 접속하여 서로 명령을 주고 받으며 로봇을 제어합니다.
 
@@ -56,6 +60,64 @@ Event 클래스를 이용하여 언제든지 기능을 추가 할 수 있도록 
 
 Event 클래스의 하위 클래스를 만든 후 setEvent()
 함수를 이용해 서버에 Event를 등록할 수 있습니다.
+***
+
+### 사용법
+
+> **이벤트** 클래스 사용법
+
+`HelloWorld` 타입의 이벤트를 만들어 보겠습니다.
+
+```python
+from Event import Event
+```
+우선 이벤트 클래스를 `import`합니다.
+
+```python
+class helloWorldEvent(Event):
+  def __init__(self):
+    super().__init__()
+```
+`Event`를 상속받는 `helloWorldEvent` 클래스를 선언합니다.
+
+```python
+def __init__(self):
+  super().__init__()
+  self.requests = {'HelloWorld':self.helloWorld}
+```
+`HelloWorld` 명령을 받았을 경우 호출시킬 함수를 등록합니다.
+
+```python
+def helloWorld(self, *args):
+  print(f'HelloWorld! Get args: {args})
+  return 'Hello Client!'
+```
+`HelloWorld` 명령을 받은 경우 호출되는 함수를 선언했습니다. `HelloWorld` 명령을 받으면 `"HelloWorld!"`를 출력하고, 받은 args들을 함께 출력합니다.
+그 후 `'Hello Client!`를 전송합니다. (return 값을 전송합니다.)
+
+다음은 전체 코드입니다.
+
+```python
+class helloWorldEvent(Event):
+  def __init__(self):
+    super().__init__()
+    self.requests = {'HelloWorld':self.helloWorld}
+  def helloWorld(self, *args):
+    print(f'HelloWorld! Get args: {args})
+```
+
+이렇게 이벤트 클래스를 만들었습니다.
+
+그럼 이벤트 클래스를 서버에 등록해 보겠습니다.
+```python
+# main.py
+if __name__ == '__main__':
+  from helloWorldEvent import helloWorldEvent
+  setEvent('HelloWorld', helloWorldEvent)
+```
+
+`HelloWorld` 타입의 클래스를 `helloWorldEvent`로 등록했습니다.
+
 ***
 ### 사용 부품 리스트
 | 이름 | 개수  |
