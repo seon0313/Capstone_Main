@@ -95,7 +95,13 @@ def helloWorld(self, *args):
   return 'Hello Client!'
 ```
 `HelloWorld` 명령을 받은 경우 호출되는 함수를 선언했습니다. `HelloWorld` 명령을 받으면 `"HelloWorld!"`를 출력하고, 받은 args들을 함께 출력합니다.
-그 후 `'Hello Client!`를 전송합니다. (return 값을 전송합니다.)
+그 후 `'Hello Client!`를 전송합니다.
+
+메세지를 전송한 클라이언트에게 메세지를 전송할려면 전송할 메세지를 `return`하면 됩니다. 만약 특정 타입의 클라이언트에게 전송할려면 메세지와 타입을 같이 아래와 같이 리턴해 주세요.
+
+```python
+return 'HelloWorld', '2th_Arduino'
+```
 
 다음은 전체 코드입니다.
 
