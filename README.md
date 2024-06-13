@@ -112,6 +112,7 @@ class helloWorldEvent(Event):
   def __init__(self):
     super().__init__()
     self.requests['HelloWorld'] = self.helloWorld
+
   def helloWorld(self, device, *args):
     print(f'HelloWorld! Get args: {args})
 ```
