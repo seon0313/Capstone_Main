@@ -100,7 +100,7 @@ def helloWorld(self, *args):
 메세지를 전송한 클라이언트에게 메세지를 전송할려면 전송할 메세지를 `return`하면 됩니다. 만약 특정 타입의 클라이언트에게 전송할려면 메세지와 타입을 같이 아래와 같이 리턴해 주세요.
 
 ```python
-return 'HelloWorld', '2th_Arduino'
+return 'HelloWorld', '2th_Arduino' # To. "2th_Arduino"
 ```
 
 다음은 전체 코드입니다.
