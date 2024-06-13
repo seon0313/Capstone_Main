@@ -1,12 +1,13 @@
 class Event:
     def __init__(self):
         self.requests = {'HelloWorld': self.helloWorld}
-    def helloWorld(self, *args) -> str:
-        return f'HelloWorld, args: {args}'
+        print(f'"{self.__class__.__name__}" Loaded')
+    def helloWorld(self, device, *args) -> str:
+        return f'HelloWorld, device: {device} | args: {args}'
 
-    def run(self, request, *args):
+    def run(self, device, request, *args):
         v = self.requests.get(request)
         if v:
-            return v(*args)
+            return v(device, *args)
 
         return None

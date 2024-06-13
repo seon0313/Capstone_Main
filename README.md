@@ -109,7 +109,7 @@ return 'HelloWorld', '2th_Arduino' # To. "2th_Arduino"
 class helloWorldEvent(Event):
   def __init__(self):
     super().__init__()
-    self.requests = {'HelloWorld':self.helloWorld}
+    self.requests['HelloWorld'] = self.helloWorld
   def helloWorld(self, *args):
     print(f'HelloWorld! Get args: {args})
 ```

@@ -56,15 +56,17 @@ async def client(websocket, path):
     while True:
         try:
             data = await websocket.recv()
-            data = json.loads(data)
-            request = data['request']
+            data: dict = json.loads(data)
+            device = data['device']
+            request = data['device']
+            if data.get('target') != None: request = data['target']
             type_ = data['type']
 
             if target == None:
                 target = request
                 connection[target] = websocket
 
-            eventVar: str = events[type_].run(request, *data['arg'])
+            eventVar: str = events[type_].run(device, request, *data['arg'])
             if eventVar != None:
 
                 sendTarget = None
@@ -91,7 +93,9 @@ if __name__ == '__main__':
     print(hashlib.sha256(b'seon1234SEORO_By_Seon').hexdigest())
 
     from ControllerEvent import ControllerEvent
+    from Event import Event
 
+    setEvent('test', Event())
     setEvent('controller', ControllerEvent())
 
     start_server = websockets.serve(client, "0.0.0.0", 9875)
