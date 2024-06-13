@@ -90,12 +90,14 @@ def __init__(self):
 `HelloWorld` 명령을 받았을 경우 호출시킬 함수를 등록합니다.
 
 ```python
-def helloWorld(self, *args):
+def helloWorld(self, device, *args):
   print(f'HelloWorld! Get args: {args})
   return 'Hello Client!'
 ```
 `HelloWorld` 명령을 받은 경우 호출되는 함수를 선언했습니다. `HelloWorld` 명령을 받으면 `"HelloWorld!"`를 출력하고, 받은 args들을 함께 출력합니다.
 그 후 `'Hello Client!`를 전송합니다.
+
+메세지를 전송한 디바이스의 이름(Type)은 device 변수에 `string`형태로 전달됩니다.
 
 메세지를 전송한 클라이언트에게 메세지를 전송할려면 전송할 메세지를 `return`하면 됩니다. 만약 특정 타입의 클라이언트에게 전송할려면 메세지와 타입을 같이 아래와 같이 리턴해 주세요.
 
@@ -110,7 +112,7 @@ class helloWorldEvent(Event):
   def __init__(self):
     super().__init__()
     self.requests['HelloWorld'] = self.helloWorld
-  def helloWorld(self, *args):
+  def helloWorld(self, device, *args):
     print(f'HelloWorld! Get args: {args})
 ```
 
