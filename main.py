@@ -1,6 +1,4 @@
 import asyncio
-import time
-
 import websockets
 import sqlite3
 import uuid
@@ -23,6 +21,7 @@ con.close()
 server_cool = 1 / 12
 
 events = {}
+connection = {}
 
 
 class Type:
@@ -64,10 +63,8 @@ def getData(msg: str, all=False):
 
 
 async def client(websocket, path):
-    user = None
     print('Connected : ', path)
-    msg = {'result': 'login', 'type': 'string', 'data': 'need'}
-    await websocket.send(json.dumps(msg))
+    target = None
     while True:
         try:
             data = await websocket.recv()
@@ -75,10 +72,18 @@ async def client(websocket, path):
             request = data['request']
             type = data['type']
 
+            if target == None:
+                target = request
+                connection[target] = websocket
+
             eventVar: str = events[type].run(request, *data['arg'])
             if eventVar != None:
-                await websocket.send(json.dumps(eventVar))
+                if type(eventVar) != tuple: await websocket.send(json.dumps(eventVar))
+                else:
+                    if connection.get(eventVar[1]) != None:
+                        await connection.get(eventVar[1]).send(json.dumps(eventVar))
         except Exception as e:
+            connection.pop(target)
             print('Disconnect - Error', e)
             break
 
