@@ -121,7 +121,7 @@ class helloWorldEvent(Event):
 # main.py
 if __name__ == '__main__':
   from helloWorldEvent import helloWorldEvent
-  setEvent('HelloWorld', helloWorldEvent)
+  setEvent('HelloWorld', helloWorldEvent())
 ```
 
 `HelloWorld` 타입의 클래스를 `helloWorldEvent`로 등록했습니다.

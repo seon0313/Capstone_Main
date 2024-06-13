@@ -9,9 +9,6 @@ import hashlib
 
 con = sqlite3.connect('./data.db')
 
-print(uuid.uuid4().hex)
-print(hashlib.sha256(b'seon1234SEORO_By_Seon').hexdigest())
-
 cur = con.cursor()
 cur.execute('create table if not exists pids (id real, p real, i real, d real, time real)')
 cur.execute('create table if not exists pid (id real)')
@@ -24,22 +21,13 @@ events = {}
 connection = {}
 
 
-class Type:
-    HelloWorld: int = 0
-    Control: int = 1
-    Display: int = 2
-
-def send(target, msg):
-    pass
-
-
 def setEvent(name: str, func) -> bool:
     global events
     try:
         events[name] = func
         return True
     except Exception as e:
-        print(e)
+        print('setEvent Error:\t', e)
         return False
 
 
@@ -70,18 +58,28 @@ async def client(websocket, path):
             data = await websocket.recv()
             data = json.loads(data)
             request = data['request']
-            type = data['type']
+            type_ = data['type']
 
             if target == None:
                 target = request
                 connection[target] = websocket
 
-            eventVar: str = events[type].run(request, *data['arg'])
+            eventVar: str = events[type_].run(request, *data['arg'])
             if eventVar != None:
-                if type(eventVar) != tuple: await websocket.send(json.dumps(eventVar))
-                else:
-                    if connection.get(eventVar[1]) != None:
-                        await connection.get(eventVar[1]).send(json.dumps(eventVar))
+
+                sendTarget = None
+                msg = eventVar
+                if type(eventVar) == tuple:
+                    v = connection.get(eventVar[1])
+                    if v != None:
+                        sendTarget = v
+                        msg = eventVar[0]
+                else: sendTarget = websocket
+
+                if type(msg) == dict:
+                    await sendTarget.send(json.dumps(msg))
+                else: await sendTarget.send(msg)
+
         except Exception as e:
             connection.pop(target)
             print('Disconnect - Error', e)
@@ -89,10 +87,12 @@ async def client(websocket, path):
 
 
 if __name__ == '__main__':
+    print(uuid.uuid4().hex)
+    print(hashlib.sha256(b'seon1234SEORO_By_Seon').hexdigest())
 
     from ControllerEvent import ControllerEvent
 
-    setEvent('controller', ControllerEvent)
+    setEvent('controller', ControllerEvent())
 
     start_server = websockets.serve(client, "0.0.0.0", 9875)
     asyncio.get_event_loop().run_until_complete(start_server)

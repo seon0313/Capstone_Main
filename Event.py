@@ -1,7 +1,6 @@
 class Event:
     def __init__(self):
-        self.requests = {'HelloWorld':self.helloWorld}
-        self.send = send
+        self.requests = {'HelloWorld': self.helloWorld}
     def helloWorld(self, *args) -> str:
         return f'HelloWorld, args: {args}'
 
