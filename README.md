@@ -11,6 +11,7 @@
 
 
 ![circuit.png](/images/rpi4b.svg)
+
 이 프로젝트는 라즈베리파이 기반으로 개발 되었습니다.
 
 ***
