@@ -85,7 +85,7 @@ class helloWorldEvent(Event):
 ```python
 def __init__(self):
   super().__init__()
-  self.requests = {'HelloWorld':self.helloWorld}
+  self.requests['HelloWorld'] = self.helloWorld
 ```
 `HelloWorld` 명령을 받았을 경우 호출시킬 함수를 등록합니다.
 
