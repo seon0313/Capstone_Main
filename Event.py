@@ -1,9 +1,7 @@
 from main import send as ss
-from main import Type
 
 class Event:
-    def __init__(self, send:ss):
-        self.type = Type.HelloWorld
+    def __init__(self):
         self.requests = {'HelloWorld':self.helloWorld}
         self.send = send
     def helloWorld(self, *args) -> str:
