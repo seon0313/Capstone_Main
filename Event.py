@@ -1,5 +1,3 @@
-from main import send as ss
-
 class Event:
     def __init__(self):
         self.requests = {'HelloWorld':self.helloWorld}
