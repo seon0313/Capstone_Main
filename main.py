@@ -66,9 +66,8 @@ async def client(websocket, path):
                 target = request
                 connection[target] = websocket
 
-            eventVar: str = events[type_].run(device, request, *data['arg'])
+            eventVar: str = events[request].run(device, type_, *data['arg'])
             if eventVar != None:
-
                 sendTarget = None
                 msg = eventVar
                 if type(eventVar) == tuple:
@@ -83,7 +82,7 @@ async def client(websocket, path):
                 else: await sendTarget.send(msg)
 
         except Exception as e:
-            connection.pop(target)
+            connection.pop(device)
             print('Disconnect - Error', e)
             break
 

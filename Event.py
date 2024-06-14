@@ -6,6 +6,7 @@ class Event:
         return f'HelloWorld, device: {device} | args: {args}'
 
     def run(self, device, request, *args):
+        print(device, request, args)
         v = self.requests.get(request)
         if v:
             return v(device, *args)
