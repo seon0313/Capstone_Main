@@ -65,21 +65,24 @@ async def client(websocket, path):
             if target == None:
                 target = request
                 connection[target] = websocket
+            args = data.get('args')
+            if args == None: args = []
+            func = events.get(request)
+            if func != None:
+                eventVar: str = func.run(device, type_, *args)
+                if eventVar != None:
+                    sendTarget = None
+                    msg = eventVar
+                    if type(eventVar) == tuple:
+                        v = connection.get(eventVar[1])
+                        if v != None:
+                            sendTarget = v
+                            msg = eventVar[0]
+                    else: sendTarget = websocket
 
-            eventVar: str = events[request].run(device, type_, *data['arg'])
-            if eventVar != None:
-                sendTarget = None
-                msg = eventVar
-                if type(eventVar) == tuple:
-                    v = connection.get(eventVar[1])
-                    if v != None:
-                        sendTarget = v
-                        msg = eventVar[0]
-                else: sendTarget = websocket
-
-                if type(msg) == dict:
-                    await sendTarget.send(json.dumps(msg))
-                else: await sendTarget.send(msg)
+                    if type(msg) == dict:
+                        await sendTarget.send(json.dumps(msg))
+                    else: await sendTarget.send(msg)
 
         except Exception as e:
             print(connection)
