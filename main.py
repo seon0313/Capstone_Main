@@ -82,7 +82,9 @@ async def client(websocket, path):
                 else: await sendTarget.send(msg)
 
         except Exception as e:
+            print(connection)
             connection.pop(device)
+            print(connection)
             print('Disconnect - Error', e)
             break
 
