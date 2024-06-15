@@ -63,13 +63,14 @@ async def client(websocket, path):
             type_ = data['type']
 
             if target == None:
-                target = request
+                target = device
                 connection[target] = websocket
+
             args = data.get('args')
             if args == None: args = []
             func = events.get(request)
             if func != None:
-                eventVar: str = func.run(device, type_, *args)
+                eventVar: str = func.run(device, type_, data.get('target'), *args)
                 if eventVar != None:
                     sendTarget = None
                     msg = eventVar
@@ -79,15 +80,13 @@ async def client(websocket, path):
                             sendTarget = v
                             msg = eventVar[0]
                     else: sendTarget = websocket
-
-                    if type(msg) == dict:
-                        await sendTarget.send(json.dumps(msg))
-                    else: await sendTarget.send(msg)
+                    if sendTarget:
+                        if type(msg) == dict:
+                            await sendTarget.send(json.dumps(msg))
+                        else: await sendTarget.send(msg)
 
         except Exception as e:
-            print(connection)
             connection.pop(device)
-            print(connection)
             print('Disconnect - Error', e)
             break
 

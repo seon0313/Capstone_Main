@@ -6,10 +6,11 @@ class Event:
     def helloWorld(self, device, *args) -> str:
         return f'HelloWorld, device: {device} | args: {args}'
 
-    def run(self, device, request, *args):
-        print(device, request, args)
+    def run(self, device, request,target, *args):
         v = self.requests.get(request)
         if v:
-            return v(device, *args)
+            if target==None:
+                return v(device, *args)
+            else: return (v(device, *args), target)
 
         return None
