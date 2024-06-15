@@ -129,6 +129,34 @@ if __name__ == '__main__':
 
 `HelloWorld` 타입의 클래스를 `helloWorldEvent`로 등록했습니다.
 
+> 클라이언트 메세지 형식
+
+메세지의 형식은 JSON입니다.
+
+서버에서 전송되는 메세지는 해당 `Event`에 따라 달라집니다.
+
+클라이언트의 메세지 형식은 다음과 같습니다.
+```json
+{
+  "device": "device-Name",
+  "type": "Command-Name"
+}
+```
+
+`device`의 변수값은 처음 전송한 값에서 변경되면 안됩니다.
+
+만약 다른 클라이언트에게 메세지를 전송할려면 다음과 같은 메세지를 전송해 주세요.
+
+```json
+{
+  "device": "device-Name",
+  "type": "Command-Name",
+  "target": "target-Device-Name"
+}
+```
+
+`target`을 이용하면 `device`명이 `target`값인 클라이언트에게 메세지를 전송합니다. 이때 호출되는 이벤트는 `target`의 값으로 등록된 이벤트 입니다.
+
 ***
 ### 사용 부품 리스트
 | 이름 | 개수  |
