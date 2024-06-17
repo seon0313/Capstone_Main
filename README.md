@@ -16,6 +16,8 @@
 
 [캡스톤 컨트롤러 코드](https://github.com/seon0313/Capstone_Controller)
 
+[캡스톤 AI 코드](https://github.com/seon0313/Capstone_AI)
+
 ***
 
 ### 목차
