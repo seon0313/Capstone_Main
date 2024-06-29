@@ -1,10 +1,17 @@
 class Event:
-    def __init__(self):
+    def __init__(self, sql):
         self.requests = {'HelloWorld': self.helloWorld}
-        print(f'"{self.__class__.__name__}" Event Loaded')
+        self.sql = sql
+        print(f'"{self.getName()}" Event Loaded')
+
+    def getName(self) -> str:
+        return self.__class__.__name__
 
     def helloWorld(self, device, *args) -> str:
         return f'HelloWorld, device: {device} | args: {args}'
+
+    def firstRun(self):
+        return None
 
     def run(self, device, request,target, *args):
         v = self.requests.get(request)
