@@ -7,16 +7,17 @@ class Event:
     def getName(self) -> str:
         return self.__class__.__name__
 
-    def helloWorld(self, device, *args) -> str:
+    def helloWorld(self, device:str, *args: list[str]) -> str:
         return f'HelloWorld, device: {device} | args: {args}'
 
     def firstRun(self):
         return None
 
-    def run(self, device, request,target, *args):
+    def run(self, device: str, request: str, target: str, *args):
         v = self.requests.get(request)
         if v:
-            if target==None:
+            if type(v) == type(tuple): v, target = v
+            if target is None:
                 return v(device, *args)
             else: return (v(device, *args), target)
 
