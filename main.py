@@ -10,8 +10,10 @@ import hashlib
 con = sqlite3.connect('./data.db')
 
 cur = con.cursor()
-cur.execute('create table if not exists pids (id real, p real, i real, d real, time real)')
-cur.execute('create table if not exists pid (id real)')
+cur.execute('create table if not exists pid (id text)')
+cur.execute('create table if not exists pids (id text, p real, i real, d real, time real)')
+cur.execute('create table if not exists offset (id text)')
+cur.execute('create table if not exists offsets (id text, left real, right real, time real)')
 cur.close()
 con.close()
 
@@ -19,6 +21,22 @@ server_cool = 1 / 12
 
 events = {}
 connection = {}
+
+
+def getData(msg: str, insert=False):
+    try:
+        con = sqlite3.connect('./data.db', isolation_level=None)
+        cur = con.cursor()
+        msg = cur.execute(msg)
+        if insert:
+            print('Commit')
+            con.commit()
+        cur.close()
+        con.close()
+        return msg
+    except Exception as e:
+        print(f'SQL ERROR - {e}')
+        return None
 
 
 def setEvent(name: str, func) -> bool:
@@ -53,13 +71,17 @@ def getData(msg: str, all=False):
 async def client(websocket, path):
     print('Connected : ', path)
     target = None
+    for i in events.values():
+        msg = i.firstRun()
+        if msg != None:
+            await websocket.send(msg)
     while True:
         try:
             data = await websocket.recv()
             data: dict = json.loads(data)
             device = data['device']
-            request = data['device']
-            if data.get('target') != None: request = data['target']
+            request = data['request']
+            #if data.get('target') != None: request = data['target']
             type_ = data['type']
 
             if target == None:
@@ -79,11 +101,13 @@ async def client(websocket, path):
                         if v != None:
                             sendTarget = v
                             msg = eventVar[0]
-                    else: sendTarget = websocket
+                    else:
+                        sendTarget = websocket
                     if sendTarget:
                         if type(msg) == dict:
                             await sendTarget.send(json.dumps(msg))
-                        else: await sendTarget.send(msg)
+                        else:
+                            await sendTarget.send(msg)
 
         except Exception as e:
             connection.pop(device)
@@ -97,9 +121,11 @@ if __name__ == '__main__':
 
     from ControllerEvent import ControllerEvent
     from Event import Event
+    from SystemEvent import SystemEvent
 
-    setEvent('test', Event())
-    setEvent('controller', ControllerEvent())
+    setEvent('test', Event(getData))
+    setEvent('controller', ControllerEvent(getData))
+    setEvent('system', SystemEvent(getData, events))
 
     start_server = websockets.serve(client, "0.0.0.0", 9875)
     asyncio.get_event_loop().run_until_complete(start_server)
