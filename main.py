@@ -23,22 +23,6 @@ events = {}
 connection = {}
 
 
-def getData(msg: str, insert=False):
-    try:
-        con = sqlite3.connect('./data.db', isolation_level=None)
-        cur = con.cursor()
-        msg = cur.execute(msg)
-        if insert:
-            print('Commit')
-            con.commit()
-        cur.close()
-        con.close()
-        return msg
-    except Exception as e:
-        print(f'SQL ERROR - {e}')
-        return None
-
-
 def setEvent(name: str, func) -> bool:
     global events
     try:
