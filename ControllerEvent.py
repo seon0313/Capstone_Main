@@ -9,14 +9,22 @@ class ControllerEvent(Event):
         self.requests['getPIDs'] = self.getPIDs
         self.requests['getOffsets'] = self.getOffsets
         self.requests['setOffset'] = self.setOffset
+        self.requests['setPID'] = self.setPID
+        self.requests['delPID'] = self.delPID
+        self.requests['getServo'] = self.getServo
         self.leftAngle = 0
         self.rightAngle = 0
 
     def firstRun(self):
         return self.getPID('',())
     def getPID(self, device: str, *args: list[str]):
-        from json import dumps
         pid = self.sql('select p,i,d from pids where id=(select id from pid)')[0]
+        try:
+            if args[0] == 'non':
+                return pid
+        except:
+            pass
+        from json import dumps
         return dumps({'request': self.getName(),'type':'getPID', 'p': pid[0], 'i': pid[1], 'd': pid[2]})
     def getPIDs(self, device: str, *args: list[str]):
         from json import dumps
@@ -27,6 +35,21 @@ class ControllerEvent(Event):
         from json import dumps
         from time import time
         from uuid import uuid4
+        import sqlite3
+        args = args[0]
+        p = args.get('p')
+        i = args.get('i')
+        d = args.get('d')
+        if p is None or i is None or d is None:
+            return dumps({'request': 'ERROR', 'type': 'addOffset', 'msg': 'missing'})
+        m = f'insert into pids values ("{uuid4().hex}", {p}, {i}, {d}, {time()})'
+        print(m)
+        con = sqlite3.connect('./data.db', isolation_level=None)
+        cur = con.cursor()
+        cur.execute(m)
+        con.commit()
+        cur.close()
+        con.close()
 
 
     def getServo(self, device: str, *args: list[str]):
@@ -55,7 +78,7 @@ class ControllerEvent(Event):
         print(m)
         con = sqlite3.connect('./data.db', isolation_level=None)
         cur = con.cursor()
-        msg = cur.execute(m)
+        cur.execute(m)
         con.commit()
         cur.close()
         con.close()
@@ -92,3 +115,31 @@ class ControllerEvent(Event):
         con.close()
 
         return dumps({'request':self.getName(), 'type': 'changeOffset', 'data':self.getOffset('','non')})
+    def setPID(self, device: str, *args: list[str]):
+        from json import dumps
+        import sqlite3
+        id = args[0]
+        r = self.sql(f'select id from pids where id="{id}"')
+        if r is None or r == () or r[0] is None:
+            return dumps({'request':'ERROR', 'type':'setOffset', 'msg':'missing'})
+        con = sqlite3.connect('./data.db', isolation_level=None)
+        cur = con.cursor()
+        msg = cur.execute(f'update pid set id="{id}"')
+        con.commit()
+        cur.close()
+        con.close()
+        pid = self.getPID('','non')
+        return dumps({'request':self.getName(), 'type': 'getPID', 'p': pid[0], 'i':pid[1], 'd':pid[2]})
+
+    def delPID(self, device: str, *args: list[str]):
+        from json import dumps
+        import sqlite3
+        id = args[0]
+        if self.sql('select id from pid')[0][0] == id: return None
+        print(id)
+        con = sqlite3.connect('./data.db', isolation_level=None)
+        cur = con.cursor()
+        msg = cur.execute(f'delete from pids where id="{id}"')
+        con.commit()
+        cur.close()
+        con.close()
