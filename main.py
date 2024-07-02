@@ -2,8 +2,6 @@ import asyncio
 import websockets
 import sqlite3
 import uuid
-import threading
-import time
 import json
 import hashlib
 
@@ -101,7 +99,6 @@ async def client(websocket, path):
 
 if __name__ == '__main__':
     print(uuid.uuid4().hex)
-    print(hashlib.sha256(b'seon1234SEORO_By_Seon').hexdigest())
 
     from ControllerEvent import ControllerEvent
     from Event import Event
