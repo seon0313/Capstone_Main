@@ -1,5 +1,6 @@
 from Event import Event
 
+
 class ControllerEvent(Event):
     def __init__(self, sql):
         super().__init__(sql)
@@ -16,7 +17,8 @@ class ControllerEvent(Event):
         self.rightAngle = 0
 
     def firstRun(self):
-        return self.getPID('',())
+        return self.getPID('', ())
+
     def getPID(self, device: str, *args: list[str]):
         pid = self.sql('select p,i,d from pids where id=(select id from pid)')[0]
         try:
@@ -25,11 +27,12 @@ class ControllerEvent(Event):
         except:
             pass
         from json import dumps
-        return dumps({'request': self.getName(),'type':'getPID', 'p': pid[0], 'i': pid[1], 'd': pid[2]})
+        return dumps({'request': self.getName(), 'type': 'getPID', 'p': pid[0], 'i': pid[1], 'd': pid[2]})
+
     def getPIDs(self, device: str, *args: list[str]):
         from json import dumps
         pids = self.sql('select id, p, i, d from pids')
-        return dumps({'request': self.getName(), 'type':'getPIDs','data':pids})
+        return dumps({'request': self.getName(), 'type': 'getPIDs', 'data': pids})
 
     def addPID(self, device: str, *args: list[str]):
         from json import dumps
@@ -51,8 +54,7 @@ class ControllerEvent(Event):
         cur.close()
         con.close()
 
-
-    def getServo(self, device: str, *args: list[str]):
+    def getServo(self, device: str, *args: list[str]) -> str:
         from json import dumps
         msg = {
             'request': self.getName(),
@@ -64,7 +66,7 @@ class ControllerEvent(Event):
         }
         return dumps(msg)
 
-    def addOffset(self, device: str, *args: list):
+    def addOffset(self, device: str, *args: list) -> None | str:
         from json import dumps
         from time import time
         from uuid import uuid4
@@ -73,7 +75,7 @@ class ControllerEvent(Event):
         l = args.get('Loffset')
         r = args.get('Roffset')
         if l is None or r is None:
-            return dumps({'request':'ERROR', 'type':'addOffset', 'msg':'missing'})
+            return dumps({'request': 'ERROR', 'type': 'addOffset', 'msg': 'missing'})
         m = f'insert into offsets values ("{uuid4().hex}", {l}, {r}, {time()})'
         print(m)
         con = sqlite3.connect('./data.db', isolation_level=None)
@@ -83,30 +85,30 @@ class ControllerEvent(Event):
         cur.close()
         con.close()
 
-
-    def getOffset(self, device: str, *args: list[str]):
-        l,r = self.sql('select left, right from offsets where id=(select id from offset)')[0]
-        print(l,r)
+    def getOffset(self, device: str, *args: list[str]) -> tuple | str:
+        l, r = self.sql('select left, right from offsets where id=(select id from offset)')[0]
+        print(l, r)
         try:
             if args[0] == 'non':
                 return l, r
-        except: pass
+        except:
+            pass
         from json import dumps
-        return dumps({'request':self.getName(), 'type':'getOffset', 'l':l,'r':r})
+        return dumps({'request': self.getName(), 'type': 'getOffset', 'l': l, 'r': r})
 
-    def getOffsets(self, device: str, *args: list[str]):
+    def getOffsets(self, device: str, *args: list[str]) -> str:
         from json import dumps
         d = self.sql('select id, left, right from offsets')
         print('!', d)
-        return dumps({'request':self.getName(), 'type':'getOffsets', 'data':d})
+        return dumps({'request': self.getName(), 'type': 'getOffsets', 'data': d})
 
-    def setOffset(self, device: str, *args: list[str]):
+    def setOffset(self, device: str, *args: list[str]) -> str:
         from json import dumps
         import sqlite3
         id = args[0]
         r = self.sql(f'select id from offsets where id="{id}"')
         if r is None or r == () or r[0] is None:
-            return dumps({'request':'ERROR', 'type':'setOffset', 'msg':'missing'})
+            return dumps({'request': 'ERROR', 'type': 'setOffset', 'msg': 'missing'})
         con = sqlite3.connect('./data.db', isolation_level=None)
         cur = con.cursor()
         msg = cur.execute(f'update offset set id="{id}"')
@@ -114,24 +116,25 @@ class ControllerEvent(Event):
         cur.close()
         con.close()
 
-        return dumps({'request':self.getName(), 'type': 'changeOffset', 'data':self.getOffset('','non')})
-    def setPID(self, device: str, *args: list[str]):
+        return dumps({'request': self.getName(), 'type': 'changeOffset', 'data': self.getOffset('', 'non')})
+
+    def setPID(self, device: str, *args: list[str]) -> str:
         from json import dumps
         import sqlite3
         id = args[0]
         r = self.sql(f'select id from pids where id="{id}"')
         if r is None or r == () or r[0] is None:
-            return dumps({'request':'ERROR', 'type':'setOffset', 'msg':'missing'})
+            return dumps({'request': 'ERROR', 'type': 'setOffset', 'msg': 'missing'})
         con = sqlite3.connect('./data.db', isolation_level=None)
         cur = con.cursor()
         msg = cur.execute(f'update pid set id="{id}"')
         con.commit()
         cur.close()
         con.close()
-        pid = self.getPID('','non')
-        return dumps({'request':self.getName(), 'type': 'getPID', 'p': pid[0], 'i':pid[1], 'd':pid[2]})
+        pid = self.getPID('', 'non')
+        return dumps({'request': self.getName(), 'type': 'getPID', 'p': pid[0], 'i': pid[1], 'd': pid[2]})
 
-    def delPID(self, device: str, *args: list[str]):
+    def delPID(self, device: str, *args: list[str]) -> None:
         from json import dumps
         import sqlite3
         id = args[0]
