@@ -11,6 +11,7 @@ class ControllerEvent(Event):
         self.requests['getOffsets'] = self.getOffsets
         self.requests['setOffset'] = self.setOffset
         self.requests['setPID'] = self.setPID
+        self.requests['addPID'] = self.addPID
         self.requests['delPID'] = self.delPID
         self.requests['getServo'] = self.getServo
         self.leftAngle = 0
